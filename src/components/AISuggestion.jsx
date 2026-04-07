@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_URL } from "../services/api";
 
 export default function AISuggestion() {
 
@@ -13,7 +14,7 @@ export default function AISuggestion() {
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
 
-    fetch(`http://localhost:8080/api/ai/suggest?interest=${encodeURIComponent(input)}`)
+    fetch(`${API_URL}/ai/suggest?interest=${encodeURIComponent(input)}`)
       .then(res => res.text())
       .then(data => {
         const aiMsg = { sender: "ai", text: data };

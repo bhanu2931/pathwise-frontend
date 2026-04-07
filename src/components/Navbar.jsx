@@ -1,13 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Navbar({ openLogin, user, setUser }) {
+export default function Navbar({ user, setUser }) {
 
   const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
+  const avatarLabel = typeof user === "string" ? user.charAt(0) : user?.email?.charAt(0) || "U";
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
     setShowMenu(false);
+    navigate("/");
   };
 
   return (
@@ -27,7 +31,7 @@ export default function Navbar({ openLogin, user, setUser }) {
       <div style={{ display: "flex", alignItems: "center" }}>
 
         {!user ? (
-          <button style={loginBtn} onClick={openLogin}>
+          <button style={loginBtn} onClick={() => navigate("/login")}>
             Sign In
           </button>
         ) : (
@@ -38,14 +42,14 @@ export default function Navbar({ openLogin, user, setUser }) {
               onClick={() => setShowMenu(!showMenu)}
               style={avatar}
             >
-              {user.charAt(0).toUpperCase()}
+              {avatarLabel.toUpperCase()}
             </div>
 
             {/* DROPDOWN */}
             {showMenu && (
               <div style={dropdown}>
                 
-                <p style={emailText}>{user}</p>
+                <p style={emailText}>{user.email || user}</p>
 
                 <button style={logoutBtn} onClick={handleLogout}
                   onMouseOver={(e) => e.target.style.background = "rgba(255,255,255,0.1)"}

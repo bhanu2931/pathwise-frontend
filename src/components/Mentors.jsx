@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import BASE_URL from "../api";
+import { getMentors } from "../services/api";
+import MentorCard from "./MentorCard";
 
 export default function Mentors() {
 
   const [mentors, setMentors] = useState([]);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/mentors`)
-      .then(res => res.json())
-      .then(data => setMentors(data));
+    getMentors()
+      .then((data) => setMentors(data || []))
+      .catch(() => setMentors([]));
   }, []);
 
   return (
@@ -16,30 +17,15 @@ export default function Mentors() {
       <h2 style={title}>Our Expert Mentors</h2>
 
       <div style={grid}>
-        {mentors.map((m, i) => (
-          <div
-            key={i}
-            style={card}
-            onClick={() => {
-              localStorage.setItem("selectedMentor", m.name);
+        {mentors.map((m) => (
+          <MentorCard
+            key={m.id || m.name}
+            mentor={m}
+            onSelect={(mentor) => {
+              localStorage.setItem("selectedMentor", mentor.name);
               window.scrollTo(0, document.body.scrollHeight);
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-          >
-
-            {/* Avatar */}
-            <div style={avatar}>
-              {m.name.charAt(0)}
-            </div>
-
-            {/* Info */}
-            <div>
-              <h3 style={name}>{m.name}</h3>
-              <p style={field}>{m.expertise}</p>
-            </div>
-
-          </div>
+          />
         ))}
       </div>
     </div>

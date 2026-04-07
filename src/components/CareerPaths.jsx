@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { getCareerPaths } from '../services/api'
+import CareerCard from './CareerCard'
 
 export default function CareerPaths() {
 
@@ -27,8 +29,7 @@ export default function CareerPaths() {
 
   // 🔥 FETCH FROM BACKEND
   useEffect(() => {
-    fetch("http://localhost:8080/api/careers")
-      .then(res => res.json())
+    getCareerPaths()
       .then(data => {
         if (data && data.length > 0) {
           setPaths(data)
@@ -57,26 +58,12 @@ export default function CareerPaths() {
         {/* LEFT LIST */}
         <div className="paths-list">
           {displayPaths.map((path, index) => (
-            <div
+            <CareerCard
               key={index}
-              className={`path-list-item ${selectedPath === index ? 'active' : ''}`}
+              path={path}
+              active={selectedPath === index}
               onClick={() => setSelectedPath(index)}
-            >
-              <span className="path-icon">{path.icon || '💼'}</span>
-
-              <span className="path-name">
-                {path.title || path.name}
-              </span>
-
-              {/* ✅ FIXED */}
-              <span className="path-salary">
-                {path.salary || '₹8L – ₹40L'}
-              </span>
-
-              <span className="path-growth-badge">
-                {path.growth || '+20%'}
-              </span>
-            </div>
+            />
           ))}
         </div>
 

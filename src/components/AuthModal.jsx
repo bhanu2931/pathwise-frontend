@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BASE_URL from "../api";
+import { API_URL } from "../services/api";
 
 export default function AuthModal({ show, close, setUser }) {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function AuthModal({ show, close, setUser }) {
 
   const handleLogin = async () => {
     setLoading(true);
-    const res = await fetch(`${BASE_URL}/auth/login`, {
+    const res = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,7 +41,7 @@ export default function AuthModal({ show, close, setUser }) {
   };
 
   const handleSignup = async () => {
-    const res = await fetch(`${BASE_URL}/auth/register`, {
+    const res = await fetch(`${API_URL}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { API_URL } from "../services/api";
 
 export default function BookSession({ user }) {
 
   const [date, setDate] = useState("");
-
+  const activeUser = user || JSON.parse(localStorage.getItem("user"))?.email;
   const mentor = localStorage.getItem("selectedMentor");
 
   const bookSession = () => {
@@ -13,13 +14,18 @@ export default function BookSession({ user }) {
       return;
     }
 
-    fetch("http://localhost:8080/api/appointments", {
+    if (!activeUser) {
+      alert("Please sign in before booking a session.");
+      return;
+    }
+
+    fetch(`${API_URL}/appointments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email: user,
+        email: activeUser,
         mentor: mentor,
         date: date
       })
