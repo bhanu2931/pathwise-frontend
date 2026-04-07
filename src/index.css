@@ -1483,6 +1483,59 @@ body {
   font-size: 0.85rem;
   color: #5de2ff;
   margin-bottom: 0.4rem;
+}
+
+/* INTERACTIVE EFFECTS - PROFESSIONAL POLISH */
+
+/* Global Button Hover Effects */
+button:not(:disabled) {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:not(:disabled):hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.6);
+}
+
+button:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+/* Input Focus States */
+input:focus {
+  outline: none;
+  border: 1px solid #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), inset 0 0 0 1px rgba(99, 102, 241, 0.2);
+  background: rgba(99, 102, 241, 0.05) !important;
+}
+
+textarea:focus {
+  outline: none;
+  border: 1px solid #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), inset 0 0 0 1px rgba(99, 102, 241, 0.2);
+  background: rgba(99, 102, 241, 0.05) !important;
+}
+
+/* .btn-glow Hover Enhancement */
+.btn-glow:not(:disabled):hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(79, 70, 229, 0.8);
+}
+
+/* Chat Input Styling */
+.chat-input {
+  transition: all 0.3s ease;
+}
+
+.chat-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
   font-weight: 600;
 }
 

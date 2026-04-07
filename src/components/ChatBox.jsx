@@ -45,8 +45,13 @@ export default function ChatBox() {
   };
 
   return (
-    <div className="glass" style={{ padding: "24px", marginTop: "24px" }}>
-      <h3>AI Career Chat</h3>
+    <div className="glass" style={{ padding: "24px", marginTop: "24px", borderRadius: "16px", background: "rgba(79, 70, 229, 0.08)" }}>
+      <h3 style={{ margin: "0 0 4px 0", fontSize: "20px", fontWeight: "700", color: "#f0f9ff" }}>
+        🤖 AI Career Assistant
+      </h3>
+      <p style={{ margin: "0 0 16px 0", color: "#cbd5e1", fontSize: "13px" }}>
+        Get personalized career guidance powered by AI
+      </p>
       <div style={{ minHeight: "160px", margin: "18px 0", display: "flex", flexDirection: "column", gap: "10px" }}>
         {history.length === 0 ? (
           <p style={{ opacity: 0.75 }}>Ask something about your career path or skills.</p>
@@ -63,8 +68,9 @@ export default function ChatBox() {
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Ask something..."
-          style={{ flex: 1, padding: "12px 14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "#fff" }}
+          placeholder="Ask about your career path, skills..."
+          className="chat-input"
+          style={{ flex: 1, padding: "12px 14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: "14px" }}
         />
         <button className="btn-glow" onClick={handleSend} disabled={loading} style={{ flexShrink: 0 }}>
           {loading ? "Thinking... ✨" : "Send"}
