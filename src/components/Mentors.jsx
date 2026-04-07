@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import BASE_URL from "../api";
 
 export default function Mentors() {
 
   const [mentors, setMentors] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/mentors")
+    fetch(`${BASE_URL}/mentors`)
       .then(res => res.json())
       .then(data => setMentors(data));
   }, []);
@@ -35,7 +36,7 @@ export default function Mentors() {
             {/* Info */}
             <div>
               <h3 style={name}>{m.name}</h3>
-              <p style={field}>{m.field}</p>
+              <p style={field}>{m.expertise}</p>
             </div>
 
           </div>

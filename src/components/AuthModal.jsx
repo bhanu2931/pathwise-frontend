@@ -1,4 +1,5 @@
 import { useState } from "react";
+import BASE_URL from "../api";
 
 export default function AuthModal({ show, close, setUser }) {
 
@@ -10,45 +11,46 @@ export default function AuthModal({ show, close, setUser }) {
 
   if (!show) return null;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setLoading(true);
-    fetch("http://localhost:8080/api/auth/login", {
+    const res = await fetch(`${BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password })
-    })
-    .then(res => res.text())
-    .then(data => {
-      setLoading(false);
-      if (data === "Login Success") {
-        localStorage.setItem("user", email.split("@")[0]); // 🔥 store user
-        setUser(email.split("@")[0]);
-        close();
-      } else {
-        alert("Invalid Credentials");
-      }
+      body: JSON.stringify({
+        email,
+        password,
+      }),
     });
+
+    const data = await res.text();
+    setLoading(false);
+    if (data === "Login Success") {
+      localStorage.setItem("user", email.split("@")[0]); // 🔥 store user
+      setUser(email.split("@")[0]);
+      close();
+    } else {
+      alert(data);
+    }
   };
 
-  const handleSignup = () => {
-    fetch("http://localhost:8080/api/auth/register", {
+  const handleSignup = async () => {
+    const res = await fetch(`${BASE_URL}/auth/register`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         name,
         email,
         password,
-        role: "USER"
-      })
-    })
-    .then(() => {
-      alert("Signup Success");
-      setIsSignup(false);
+      }),
     });
+
+    const data = await res.json();
+    alert("Registered successfully");
+    setIsSignup(false);
   };
 
   return (
