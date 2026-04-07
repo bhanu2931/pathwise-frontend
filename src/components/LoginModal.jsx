@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SignupModal from "./SignupModal";
 
 export default function LoginModal({ onClose, setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -75,7 +77,13 @@ export default function LoginModal({ onClose, setUser }) {
         </button>
 
         <p className="signup-text">
-          Don't have an account? <span>Sign Up</span>
+          Don't have an account?{" "}
+          <span
+            onClick={() => setShowSignup(true)}
+            style={{ cursor: "pointer", color: "#60a5fa" }}
+          >
+            Sign Up
+          </span>
         </p>
 
         <div className="divider">OR CONTINUE WITH</div>
@@ -84,6 +92,10 @@ export default function LoginModal({ onClose, setUser }) {
         <button className="linkedin-btn">Sign in with LinkedIn</button>
 
       </div>
+
+      {showSignup && (
+        <SignupModal onClose={() => setShowSignup(false)} />
+      )}
     </div>
   );
 }
