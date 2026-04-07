@@ -1,36 +1,46 @@
 import { useState } from "react";
-import { API_URL } from "../services/api";
 
 export default function ChatBox() {
   const [msg, setMsg] = useState("");
   const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
     if (!msg.trim()) return;
-    setHistory((prev) => [...prev, { type: "user", text: msg }]);
+    setLoading(true);
+    const userMsg = msg;
+    setHistory((prev) => [...prev, { type: "user", text: userMsg }]);
     setMsg("");
-    setHistory((prev) => [...prev, { type: "ai", text: "AI is thinking..." }]);
+    setHistory((prev) => [...prev, { type: "ai", text: "✨ AI is thinking..." }]);
 
     try {
-      const response = await fetch(`${API_URL}/ai/chat`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/ai/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: msg }),
+        body: JSON.stringify({ message: userMsg }),
       });
       const data = await response.json();
       console.log("AI Response:", data);
       setHistory((prev) => [
-        ...prev.filter((item) => item.type !== "ai" || item.text !== "AI is thinking..."),
-        { type: "ai", text: data?.reply || "Here’s a smart idea: focus on skills that match your goals." },
+        ...prev.filter((item) => item.type !== "ai" || item.text !== "✨ AI is thinking..."),
+        { type: "ai", text: data?.reply || "🎯 Based on your interest, you can explore Software Development & Tech leadership roles!" },
       ]);
     } catch (error) {
       console.error("AI chat failed", error);
       setHistory((prev) => [
-        ...prev.filter((item) => item.type !== "ai" || item.text !== "AI is thinking..."),
-        { type: "ai", text: "AI service is unavailable right now. Try again later." },
+        ...prev.filter((item) => item.type !== "ai" || item.text !== "✨ AI is thinking..."),
+        { type: "ai", text: "❌ AI service unavailable. Try again in a moment." },
       ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !loading) {
+      handleSend();
     }
   };
 
@@ -52,11 +62,12 @@ export default function ChatBox() {
         <input
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder="Ask something..."
           style={{ flex: 1, padding: "12px 14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "#fff" }}
         />
-        <button className="btn-glow" onClick={handleSend} style={{ flexShrink: 0 }}>
-          Send
+        <button className="btn-glow" onClick={handleSend} disabled={loading} style={{ flexShrink: 0 }}>
+          {loading ? "Thinking... ✨" : "Send"}
         </button>
       </div>
     </div>
