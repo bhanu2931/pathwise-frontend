@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import CareerPaths from "./components/CareerPaths";
@@ -21,48 +22,29 @@ function App() {
   }, []);
 
   return (
-    <>
+    <Router>
       <Navbar 
         openLogin={() => setShowAuth(true)} 
         user={user}
         setUser={setUser}
       />
 
-      {/* 🔓 BEFORE LOGIN */}
-      {!user && (
-        <>
-          <Hero />
-          <CareerPaths />
-        </>
-      )}
-
-      {/* 🔐 AFTER LOGIN */}
-      {user && (
-        <div style={mainContainer}>
-
-          <Dashboard user={user} />
-
-          <section style={section}>
-            <Mentors />
-          </section>
-
-          <section style={section}>
-            <BookSession user={user} />
-          </section>
-
-          <section style={section}>
-            <AISuggestion />
-          </section>
-
-        </div>
-      )}
+      <Routes>
+        <Route path="/" element={
+          <>
+            <Hero />
+            <CareerPaths />
+          </>
+        } />
+        <Route path="/dashboard" element={<Dashboard user={user} />} />
+      </Routes>
 
       <AuthModal
         show={showAuth}
         close={() => setShowAuth(false)}
         setUser={setUser}
       />
-    </>
+    </Router>
   );
 }
 

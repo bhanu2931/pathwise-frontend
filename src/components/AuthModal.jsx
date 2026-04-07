@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BASE_URL from "../api";
 
 export default function AuthModal({ show, close, setUser }) {
+  const navigate = useNavigate();
 
   const [isSignup, setIsSignup] = useState(false);
   const [name, setName] = useState("");
@@ -26,10 +28,13 @@ export default function AuthModal({ show, close, setUser }) {
 
     const data = await res.text();
     setLoading(false);
-    if (data === "Login Success") {
+
+    if (data === "Login successful") {
+      alert("Login success ✅");
       localStorage.setItem("user", email.split("@")[0]); // 🔥 store user
       setUser(email.split("@")[0]);
-      close();
+      // 👉 redirect to dashboard
+      navigate("/dashboard");
     } else {
       alert(data);
     }

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import BASE_URL from "../api";
 
 export default function Dashboard({ user }) {
 
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/appointments")
+    fetch(`${BASE_URL}/appointments`)
       .then(res => res.json())
       .then(data => {
         const userData = data.filter(a => a.email === user);
@@ -14,20 +15,20 @@ export default function Dashboard({ user }) {
   }, [user]);
 
   return (
-    <div style={{ padding: "30px", color: "#fff" }}>
-      <div style={{
-        textAlign: "left",
-        marginBottom: "30px"
-      }}>
-        <h2>Welcome, {user}</h2>
-        <p>Your Sessions</p>
-      </div>
-
-      {appointments.map((a, i) => (
-        <div key={i}>
-          📅 {a.date} with {a.mentor}
-        </div>
-      ))}
+    <div style={{ padding: "40px" }}>
+      <h1>Welcome to Dashboard</h1>
+      <p>You are logged in as {user}!</p>
+      
+      <h2>Your Sessions</h2>
+      {appointments.length > 0 ? (
+        appointments.map((a, i) => (
+          <div key={i}>
+            📅 {a.date} with {a.mentor}
+          </div>
+        ))
+      ) : (
+        <p>No sessions booked yet.</p>
+      )}
     </div>
   );
 }
