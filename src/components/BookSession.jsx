@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { API_URL } from "../services/api";
+import { bookSession } from "../services/api";
+import toast from "react-hot-toast";
 
 export default function BookSession({ user }) {
 
@@ -7,34 +8,32 @@ export default function BookSession({ user }) {
   const activeUser = user || JSON.parse(localStorage.getItem("user"))?.email;
   const mentor = localStorage.getItem("selectedMentor");
 
-  const bookSession = () => {
-
+  const handleBook = async () => {
     if (!mentor) {
-      alert("Please select a mentor first");
+      toast.error("Please select a mentor first.");
       return;
     }
 
     if (!activeUser) {
-      alert("Please sign in before booking a session.");
+      toast.error("Please sign in before booking a session.");
       return;
     }
 
-    fetch(`${API_URL}/appointments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email: activeUser,
-        mentor: mentor,
-        date: date
-      })
-    })
-    .then(res => res.json())
-    .then(() => {
-      alert("Session Booked ✅");
+    const payload = {
+      mentorId: Number(mentor) || mentor,
+      date: date || "2026-04-10",
+      userEmail: activeUser,
+    };
+
+    try {
+      const res = await bookSession(payload);
+      console.log("Book session response:", res);
+      toast.success("Session booked successfully 🚀");
       setDate("");
-    });
+    } catch (error) {
+      console.error("Booking failed", error);
+      toast.error("Booking failed. Please try again.");
+    }
   };
 
   return (
@@ -52,7 +51,7 @@ export default function BookSession({ user }) {
           style={input}
         />
 
-        <button onClick={bookSession} style={btn}>
+        <button onClick={handleBook} style={btn}>
           Book Session
         </button>
 

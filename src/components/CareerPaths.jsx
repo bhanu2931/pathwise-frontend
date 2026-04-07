@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getCareerPaths } from '../services/api'
 import CareerCard from './CareerCard'
+import CareerDetails from './CareerDetails'
 
 export default function CareerPaths() {
 
@@ -68,46 +69,7 @@ export default function CareerPaths() {
         </div>
 
         {/* RIGHT DETAIL */}
-        <div className="path-detail">
-          <div className="path-detail-icon">{current.icon || '💼'}</div>
-
-          <h3>{current.title || current.name}</h3>
-
-          <p className="path-detail-description">
-            {current.description}
-          </p>
-
-          <div className="path-detail-meta">
-            <div className="meta-item">
-              <span className="meta-label">AVG. SALARY</span>
-              <span className="meta-value">
-                {current.salary || '₹8L – ₹40L'}
-              </span>
-            </div>
-
-            <div className="meta-item">
-              <span className="meta-label">JOB GROWTH</span>
-              <span className="meta-value">
-                {current.growth || '+20%'}
-              </span>
-            </div>
-          </div>
-
-          <div className="path-detail-skills">
-            <span className="skills-label">KEY SKILLS</span>
-
-            <div className="skills-list">
-              {(current.skills || ['Java', 'React', 'SQL']).map((skill, i) => (
-                <span key={i} className="skill-tag">{skill}</span>
-              ))}
-            </div>
-          </div>
-
-          <button className="btn-primary">
-            Explore {(current.title || current.name)?.split(' ')[0]} Path →
-          </button>
-        </div>
-
+        <CareerDetails current={current} />
       </div>
     </section>
   )

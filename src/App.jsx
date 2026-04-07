@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")));
@@ -12,9 +13,16 @@ function App() {
     <Router>
       <Navbar user={user} setUser={setUser} />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home setUser={setUser} />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
-        <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Login setUser={setUser} />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard user={user} />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

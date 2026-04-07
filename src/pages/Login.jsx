@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/api";
+import "./login.css";
 
 export default function Login({ setUser }) {
   const [email, setEmail] = useState("");
@@ -10,83 +11,72 @@ export default function Login({ setUser }) {
 
   const handleLogin = async () => {
     setLoading(true);
-    const res = await loginUser({ email, password });
-    setLoading(false);
-
-    if (res.success) {
-      const userData = { email };
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser?.(userData);
-      navigate("/dashboard");
-    } else {
-      alert(res.message || "Login failed");
+    try {
+      const res = await loginUser({ email, password });
+      if (res.success) {
+        const userData = res.user ? res.user : { email };
+        if (res.token) {
+          localStorage.setItem("token", res.token);
+        }
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser?.(userData);
+        navigate("/dashboard");
+      } else {
+        alert(res.message || "Login failed");
+      }
+    } catch (err) {
+      console.error("Login error", err);
+      alert("Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={container}>
-      <div style={card}>
-        <h2>Sign In to PathWise</h2>
+    <div className="login-container">
+      <div className="login-card">
+        <h2 className="title">Welcome Back</h2>
+        <p className="subtitle">Sign in to PathWise</p>
+
+        <div className="badge">🚀 AI-POWERED CAREER PLATFORM</div>
+
         <input
           type="email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          style={input}
         />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          style={input}
-        />
-        <button style={button} onClick={handleLogin} disabled={loading}>
-          {loading ? "Signing in..." : "Sign In"}
+
+        <div className="password-box">
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <span className="forgot">Forgot password?</span>
+        </div>
+
+        <button className="btn-login" onClick={handleLogin} disabled={loading}>
+          {loading ? "Signing In..." : "Sign In"}
         </button>
+
+        <p className="signup-text">
+          Don’t have an account? <span>Sign Up</span>
+        </p>
+
+        <div className="divider">OR CONTINUE WITH</div>
+
+        <div className="social-buttons">
+          <button className="google">Sign in with Google</button>
+          <button className="linkedin">Sign in with LinkedIn</button>
+        </div>
+
+        <p className="terms">
+          By signing in, you agree to our Terms & Privacy Policy.
+        </p>
       </div>
     </div>
   );
 }
 
-const container = {
-  minHeight: "100vh",
-  background: "#050816",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: "40px 20px",
-};
-
-const card = {
-  width: "100%",
-  maxWidth: "420px",
-  background: "rgba(255,255,255,0.05)",
-  borderRadius: "24px",
-  padding: "32px",
-  border: "1px solid rgba(255,255,255,0.08)",
-  boxShadow: "0 40px 80px rgba(0,0,0,0.25)",
-  color: "#fff",
-};
-
-const input = {
-  width: "100%",
-  padding: "14px 16px",
-  borderRadius: "14px",
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.05)",
-  color: "#fff",
-  marginBottom: "16px",
-  outline: "none",
-};
-
-const button = {
-  width: "100%",
-  padding: "14px 16px",
-  borderRadius: "14px",
-  border: "none",
-  background: "linear-gradient(90deg,#5f9cff,#7a5fff)",
-  color: "#fff",
-  cursor: "pointer",
-  fontWeight: "bold",
-};
