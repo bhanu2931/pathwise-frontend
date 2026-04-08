@@ -1,146 +1,82 @@
 import { useState } from "react";
+import { getUser, logout } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 
-export default function Navbar({ user, setUser }) {
-  const [showMenu, setShowMenu] = useState(false);
+const Navbar = ({ onLoginClick }) => {
+  const user = getUser();
   const navigate = useNavigate();
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const profileUser = user || storedUser;
-  const avatarLabel = typeof profileUser === "string" ? profileUser.charAt(0) : profileUser?.email?.charAt(0) || "U";
+  const [open, setOpen] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    setUser(null);
-    setShowMenu(false);
-    navigate("/");
+  const getInitial = () => {
+    if (!user) return "";
+    return user.replace("token_", "").charAt(0).toUpperCase();
   };
 
   return (
-    <nav style={navStyle}>
+    <div className="flex justify-between items-center px-10 py-5 border-b border-white/10 sticky top-0 z-50 bg-[#020617]">
 
-      {/* LEFT LOGO */}
-      <h2 style={{ color: "#fff" }}>🚀 PathWise</h2>
+      {/* LOGO */}
+      <h1
+        onClick={() => navigate("/")}
+        className="text-2xl font-bold cursor-pointer gradient-text"
+      >
+        PathWise
+      </h1>
 
-      {/* CENTER NAV */}
-      <div style={{ display: "flex", gap: "20px" }}>
-        <span style={navLink}>Career Paths</span>
-        <span style={navLink}>Mentors</span>
-        <span style={navLink}>Sessions</span>
+      {/* NAV */}
+      <div className="hidden md:flex gap-8 text-gray-300 text-sm">
+        <span onClick={() => navigate("/")} className="cursor-pointer hover:text-white">Home</span>
+        <span className="cursor-pointer hover:text-white">Features</span>
+        <span className="cursor-pointer hover:text-white">Career</span>
+        <span className="cursor-pointer hover:text-white">Pricing</span>
+        <span onClick={() => navigate("/ai")} className="cursor-pointer hover:text-white">AI</span>
       </div>
 
-      {/* RIGHT SIDE */}
-      <div style={{ display: "flex", alignItems: "center" }}>
+      {/* RIGHT */}
+      {!user ? (
+        <button onClick={onLoginClick} className="btn-glow">
+          Get Started
+        </button>
+      ) : (
+        <div className="relative">
 
-        {!profileUser ? (
-          <button style={loginBtn} onClick={() => navigate("/login")}>
-            Sign In
-          </button>
-        ) : (
-          <div style={{ position: "relative" }}>
-
-            {/* PROFILE CIRCLE */}
-            <div
-              onClick={() => setShowMenu(!showMenu)}
-              style={avatar}
-            >
-              {avatarLabel.toUpperCase()}
-            </div>
-
-            {/* DROPDOWN */}
-            {showMenu && (
-              <div style={dropdown}>
-                
-                <p style={emailText}>{profileUser.email || profileUser}</p>
-
-                <button style={logoutBtn} onClick={handleLogout}
-                  onMouseOver={(e) => e.target.style.background = "rgba(255,255,255,0.1)"}
-                  onMouseOut={(e) => e.target.style.background = "rgba(255,255,255,0.05)"}
-                >
-                  Logout
-                </button>
-
-              </div>
-            )}
+          <div
+            onClick={() => setOpen(!open)}
+            className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold cursor-pointer"
+          >
+            {getInitial()}
           </div>
-        )}
 
-      </div>
-    </nav>
+          {open && (
+            <div className="absolute right-0 mt-3 w-40 bg-[#020617] border border-white/10 rounded-lg p-2">
+
+              <button
+                onClick={() => {
+                  navigate("/dashboard");
+                  setOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 hover:bg-white/10 rounded"
+              >
+                Dashboard
+              </button>
+
+              <button
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+                className="w-full text-left px-3 py-2 text-red-400 hover:bg-red-500/20 rounded"
+              >
+                Logout
+              </button>
+
+            </div>
+          )}
+        </div>
+      )}
+
+    </div>
   );
-}
-
-/* 🎨 STYLES */
-
-const navStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "15px 30px",
-  background: "#0b1120",
-  position: "relative",
-  zIndex: 1000 // 🔥 important
 };
 
-const navLink = {
-  color: "#cbd5e1",
-  cursor: "pointer",
-  fontSize: "14px"
-};
-
-const loginBtn = {
-  padding: "10px 18px",
-  borderRadius: "10px",
-  border: "none",
-  background: "linear-gradient(90deg,#5f9cff,#7a5fff)",
-  color: "#fff",
-  fontWeight: "bold",
-  cursor: "pointer"
-};
-
-const avatar = {
-  width: "42px",
-  height: "42px",
-  borderRadius: "50%",
-  background: "linear-gradient(135deg,#5f9cff,#7a5fff)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "#fff",
-  fontWeight: "bold",
-  fontSize: "18px",
-  cursor: "pointer"
-};
-
-const dropdown = {
-  position: "absolute",
-  top: "60px",
-  right: "0",
-  background: "rgba(15, 23, 42, 0.95)",
-  backdropFilter: "blur(12px)",
-  padding: "16px",
-  borderRadius: "14px",
-  width: "240px",
-  boxShadow: "0 20px 50px rgba(0,0,0,0.6)",
-  textAlign: "center",
-  zIndex: 9999, // 🔥 VERY IMPORTANT (fix overlap)
-  border: "1px solid rgba(255,255,255,0.08)"
-};
-
-const emailText = {
-  marginBottom: "12px",
-  fontSize: "14px",
-  color: "#cbd5e1",
-  wordBreak: "break-all"
-};
-
-const logoutBtn = {
-  width: "100%",
-  padding: "10px",
-  borderRadius: "10px",
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(255,255,255,0.05)",
-  color: "#fff",
-  cursor: "pointer",
-  fontWeight: "500",
-  transition: "0.3s"
-};
+export default Navbar;

@@ -1,72 +1,45 @@
-export const API_URL = "https://pathwise-backend-q14f.onrender.com";
-export default API_URL;
+import axios from "axios";
+
+const API = axios.create({
+  baseURL: "http://localhost:8080",
+});
+
+// ✅ Attach token automatically
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+  return req;
+});
+
+/* ================= AUTH ================= */
 
 export const loginUser = async (data) => {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  const text = await res.text();
-
-  if (!res.ok) {
-    throw new Error(text || "API failed");
-  }
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    return {
-      success: text === "Login Success" || text === "Login successful",
-      message: text,
-      user: { email: data.email },
-    };
-  }
+  const res = await API.post("/auth/login", data);
+  return res.data;
 };
 
-export const getMentors = async () => {
-  const token = localStorage.getItem("token");
-  const res = await fetch(`${API_URL}/mentors`, {
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || "API failed");
-  }
-
-  return res.json();
+export const registerUser = async (data) => {
+  const res = await API.post("/auth/register", data);
+  return res.data;
 };
 
-export const getCareerPaths = async () => {
-  const res = await fetch(`${API_URL}/careers`);
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || "API failed");
-  }
-  return res.json();
+/* ================= BOOKINGS ================= */
+
+export const bookSession = async (data) => {
+  const res = await API.post("/appointments", data);
+  return res.data;
 };
 
-export const bookSession = async (payload) => {
-  const token = localStorage.getItem("token");
-  const res = await fetch(`${API_URL}/sessions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify(payload),
-  });
+export const getBookings = async () => {
+  const res = await API.get("/appointments");
+  return res.data;
+};
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || "API failed");
-  }
+/* ================= AI ================= */
 
-  return res.json();
+export const askAI = async (message) => {
+  const res = await API.post("/ai/chat", { message });
+  return res.data;
 };

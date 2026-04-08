@@ -1,81 +1,63 @@
 import { useState } from "react";
 
-export default function ChatBox() {
-  const [msg, setMsg] = useState("");
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(false);
+const ChatBox = () => {
+  const [messages, setMessages] = useState([
+    { text: "Hi 👋 Ask me about careers!", sender: "bot" },
+  ]);
+  const [input, setInput] = useState("");
 
-  const handleSend = async () => {
-    if (!msg.trim()) return;
-    setLoading(true);
-    const userMsg = msg;
-    setHistory((prev) => [...prev, { type: "user", text: userMsg }]);
-    setMsg("");
-    setHistory((prev) => [...prev, { type: "ai", text: "✨ AI is thinking..." }]);
+  const handleSend = () => {
+    if (!input) return;
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/ai/chat`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: userMsg }),
-      });
-      const data = await response.json();
-      console.log("AI Response:", data);
-      setHistory((prev) => [
-        ...prev.filter((item) => item.type !== "ai" || item.text !== "✨ AI is thinking..."),
-        { type: "ai", text: data?.reply || "🎯 Based on your interest, you can explore Software Development & Tech leadership roles!" },
-      ]);
-    } catch (error) {
-      console.error("AI chat failed", error);
-      setHistory((prev) => [
-        ...prev.filter((item) => item.type !== "ai" || item.text !== "✨ AI is thinking..."),
-        { type: "ai", text: "❌ AI service unavailable. Try again in a moment." },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const userMsg = { text: input, sender: "user" };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !loading) {
-      handleSend();
-    }
+    // Simple AI response (demo)
+    const botMsg = {
+      text:
+        input.toLowerCase().includes("career")
+          ? "I recommend Software Engineering or Data Science 🚀"
+          : "Great question! Explore your interests and skills 👍",
+      sender: "bot",
+    };
+
+    setMessages([...messages, userMsg, botMsg]);
+    setInput("");
   };
 
   return (
-    <div className="glass" style={{ padding: "24px", marginTop: "24px", borderRadius: "16px", background: "rgba(79, 70, 229, 0.08)" }}>
-      <h3 style={{ margin: "0 0 4px 0", fontSize: "20px", fontWeight: "700", color: "#f0f9ff" }}>
-        🤖 AI Career Assistant
-      </h3>
-      <p style={{ margin: "0 0 16px 0", color: "#cbd5e1", fontSize: "13px" }}>
-        Get personalized career guidance powered by AI
-      </p>
-      <div style={{ minHeight: "160px", margin: "18px 0", display: "flex", flexDirection: "column", gap: "10px" }}>
-        {history.length === 0 ? (
-          <p style={{ opacity: 0.75 }}>Ask something about your career path or skills.</p>
-        ) : (
-          history.map((item, index) => (
-            <div key={index} style={{ alignSelf: item.type === "user" ? "flex-end" : "flex-start", background: item.type === "user" ? "rgba(59,130,246,0.18)" : "rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "14px", maxWidth: "85%" }}>
-              {item.text}
-            </div>
-          ))
-        )}
+    <div className="fixed bottom-5 right-5 w-80 glass p-4">
+
+      <div className="h-60 overflow-y-auto mb-3 space-y-2">
+
+        {messages.map((m, i) => (
+          <div
+            key={i}
+            className={`p-2 rounded ${
+              m.sender === "user"
+                ? "bg-blue-500 text-right"
+                : "bg-gray-700 text-left"
+            }`}
+          >
+            {m.text}
+          </div>
+        ))}
+
       </div>
-      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+
+      <div className="flex gap-2">
         <input
-          value={msg}
-          onChange={(e) => setMsg(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Ask about your career path, skills..."
-          className="chat-input"
-          style={{ flex: 1, padding: "12px 14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: "14px" }}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask AI..."
+          className="flex-1"
         />
-        <button className="btn-glow" onClick={handleSend} disabled={loading} style={{ flexShrink: 0 }}>
-          {loading ? "Thinking... ✨" : "Send"}
+        <button onClick={handleSend} className="btn-primary px-3">
+          ➤
         </button>
       </div>
+
     </div>
   );
-}
+};
+
+export default ChatBox;

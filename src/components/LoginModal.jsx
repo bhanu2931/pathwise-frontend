@@ -1,101 +1,131 @@
 import { useState } from "react";
+import { loginUser, registerUser } from "../services/api";
+import { setUser } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
-import SignupModal from "./SignupModal";
 
-export default function LoginModal({ onClose, setUser }) {
+const LoginModal = ({ isOpen, onClose }) => {
+  const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      alert("Enter email & password");
-      return;
-    }
+  if (!isOpen) return null;
 
-    setLoading(true);
+  const handleSubmit = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      let res;
 
-      const data = await res.json();
+      if (isSignup) {
+        res = await registerUser({ email, password });
 
-      if (res.ok) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("token", data.token);
-        setUser?.(data.user);
-        alert("Login Successful ✅");
-        onClose?.();
-        navigate("/dashboard");
+        // 🔥 HANDLE RESPONSE
+        if (res === "User already exists") {
+          alert("⚠️ User already exists");
+          return;
+        }
+
+        alert("✅ Signup successful! Please login");
+        setIsSignup(false);
+        return;
       } else {
-        alert(data.message || "Invalid credentials ❌");
+        res = await loginUser({ email, password });
+
+        // 🔥 HANDLE LOGIN ERRORS
+        if (
+          res === "User not found" ||
+          res === "Invalid password" ||
+          res === "Missing credentials"
+        ) {
+          alert("❌ " + res);
+          return;
+        }
+
+        // ✅ SUCCESS LOGIN
+        setUser(res);
+        alert("✅ Login successful");
+        navigate("/dashboard");
+        onClose();
       }
+
     } catch (err) {
       console.error(err);
-      alert("Server error ❌");
-    } finally {
-      setLoading(false);
+      alert("❌ Server error");
     }
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="login-modal">
-        <button className="close-btn" onClick={onClose}>×</button>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex justify-center items-center z-50">
 
-        <h2>Welcome Back</h2>
-        <p className="subtitle">Sign in to PathWise</p>
+      <div className="relative w-[420px] p-8 rounded-2xl bg-[#020617] border border-white/10 shadow-2xl">
 
-        <div className="badge">🚀 AI-POWERED CAREER PLATFORM</div>
+        {/* CLOSE */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 text-xl"
+        >
+          ×
+        </button>
 
+        {/* TITLE */}
+        <h2 className="text-3xl text-center mb-6">
+          {isSignup ? "Create Account" : "Welcome Back"}
+        </h2>
+
+        {/* EMAIL */}
         <input
           type="email"
           placeholder="Email"
+          className="w-full p-3 mb-3 rounded bg-[#0f172a]"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
+        {/* PASSWORD */}
         <input
           type="password"
           placeholder="Password"
+          className="w-full p-3 mb-4 rounded bg-[#0f172a]"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="login-btn" onClick={handleLogin} disabled={loading}>
-          {loading ? "Signing In..." : "Sign In"}
+        {/* BUTTON */}
+        <button
+          onClick={handleSubmit}
+          className="btn-primary w-full"
+        >
+          {isSignup ? "Sign Up" : "Login"}
         </button>
 
-        <p className="signup-text">
-          Don't have an account?{" "}
+        {/* TOGGLE */}
+        <p className="text-center mt-4 text-gray-400">
+          {isSignup ? "Already have an account?" : "New user?"}
           <span
-            onClick={() => setShowSignup(true)}
-            style={{ cursor: "pointer", color: "#60a5fa" }}
+            onClick={() => setIsSignup(!isSignup)}
+            className="text-blue-400 ml-1 cursor-pointer"
           >
-            Sign Up
+            {isSignup ? "Login" : "Sign Up"}
           </span>
         </p>
 
-        <div className="divider">OR CONTINUE WITH</div>
+        {/* DIVIDER */}
+        <div className="text-center text-xs text-gray-500 mt-5">
+          OR CONTINUE WITH
+        </div>
 
-        <button className="google-btn">Sign in with Google</button>
-        <button className="linkedin-btn">Sign in with LinkedIn</button>
+        {/* SOCIAL BUTTONS */}
+        <button className="google-btn">
+          🔴 Continue with Google
+        </button>
+
+        <button className="linkedin-btn">
+          🔵 Continue with LinkedIn
+        </button>
 
       </div>
-
-      {showSignup && (
-        <SignupModal onClose={() => setShowSignup(false)} />
-      )}
     </div>
   );
-}
+};
+
+export default LoginModal;

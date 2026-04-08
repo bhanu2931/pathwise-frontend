@@ -1,88 +1,112 @@
-import { useEffect, useState } from "react";
-import { getMentors } from "../services/api";
-import MentorCard from "./MentorCard";
+import { useState } from "react";
+import { bookSession } from "../services/api";
+import toast from "react-hot-toast";
 
-export default function Mentors() {
+const mentors = [
+  { name: "Dr. Rajesh", role: "Software Architect" },
+  { name: "Anita Sharma", role: "Data Scientist" },
+  { name: "Rahul Verma", role: "Cybersecurity Expert" },
+];
 
-  const [mentors, setMentors] = useState([]);
+const Mentors = () => {
+  const [selected, setSelected] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
 
-  useEffect(() => {
-    getMentors()
-      .then((data) => setMentors(data || []))
-      .catch(() => setMentors([]));
-  }, []);
+  const handleBooking = async () => {
+    if (!selected || !date || !time) {
+      toast.error("Please select all fields ❌");
+      return;
+    }
+
+    try {
+      await bookSession({
+        mentorName: selected,
+        date,
+        time,
+      });
+
+      toast.success("Session booked successfully 🎉");
+
+      setSelected("");
+      setDate("");
+      setTime("");
+
+    } catch (err) {
+      toast.error("Booking failed ❌");
+    }
+  };
 
   return (
-    <div style={container}>
-      <h2 style={title}>Our Expert Mentors</h2>
+    <div className="mt-24 px-6 text-center">
 
-      <div style={grid}>
-        {mentors.map((m) => (
-          <MentorCard
-            key={m.id || m.name}
-            mentor={m}
-            onSelect={(mentor) => {
-              localStorage.setItem("selectedMentor", mentor.name);
-              window.scrollTo(0, document.body.scrollHeight);
-            }}
-          />
+      <h2 className="text-3xl mb-10">
+        Learn from <span className="gradient-text">Experts</span>
+      </h2>
+
+      {/* MENTORS */}
+      <div className="grid md:grid-cols-3 gap-6 mb-16">
+
+        {mentors.map((m, i) => (
+          <div
+            key={i}
+            className="glass p-6 hover:scale-105 transition duration-300"
+          >
+            <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+              {m.name[0]}
+            </div>
+
+            <h3 className="font-semibold">{m.name}</h3>
+            <p className="text-gray-400">{m.role}</p>
+
+            <button
+              onClick={() => setSelected(m.name)}
+              className={`mt-4 px-4 py-2 rounded ${
+                selected === m.name
+                  ? "bg-green-500"
+                  : "btn-primary"
+              }`}
+            >
+              {selected === m.name ? "Selected" : "Select"}
+            </button>
+          </div>
         ))}
+
       </div>
+
+      {/* BOOKING */}
+      <div className="glass p-8 max-w-md mx-auto">
+
+        <h3 className="text-xl mb-4">📅 Book a Session</h3>
+
+        <p className="text-gray-400 mb-4">
+          Mentor: <span className="text-blue-400">
+            {selected || "Select from above"}
+          </span>
+        </p>
+
+        <input
+          type="date"
+          className="w-full mb-3"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+
+        <input
+          type="time"
+          className="w-full mb-4"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+        />
+
+        <button onClick={handleBooking} className="btn-primary">
+          Book Session
+        </button>
+
+      </div>
+
     </div>
   );
-}
-
-/* 🎨 STYLES */
-
-const container = {
-  width: "100%",
-  padding: "50px",
-  color: "#fff",
-  textAlign: "center"
 };
 
-const title = {
-  fontSize: "28px",
-  marginBottom: "30px"
-};
-
-const grid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-  gap: "20px"
-};
-
-const card = {
-  display: "flex",
-  alignItems: "center",
-  gap: "15px",
-  padding: "20px",
-  borderRadius: "14px",
-  background: "rgba(255,255,255,0.05)",
-  backdropFilter: "blur(10px)",
-  border: "1px solid rgba(255,255,255,0.08)",
-  transition: "all 0.3s ease",
-  cursor: "pointer"
-};
-
-const avatar = {
-  width: "50px",
-  height: "50px",
-  borderRadius: "50%",
-  background: "linear-gradient(135deg,#5f9cff,#7a5fff)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontWeight: "bold",
-  fontSize: "18px"
-};
-
-const name = {
-  margin: 0
-};
-
-const field = {
-  margin: 0,
-  color: "#aaa",
-  fontSize: "14px"
-};
+export default Mentors;

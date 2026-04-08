@@ -1,35 +1,105 @@
 import { useState } from "react";
-import CareerPaths from "../components/CareerPaths";
-import Mentors from "../components/Mentors";
-import AISuggestion from "../components/AISuggestion";
-import Footer from "../components/Footer";
-import LoginModal from "../components/LoginModal";
+import { bookSession } from "../services/api";
+import { getUser } from "../utils/auth";
 
-export default function Home({ setUser }) {
-  const [showModal, setShowModal] = useState(false);
+const Home = () => {
+  const [mentor, setMentor] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+
+  const user = getUser();
+
+  const mentors = ["Dr. Rajesh", "Dr. Priya", "Dr. Kumar"];
+
+  const handleBooking = async () => {
+    if (!user) {
+      alert("⚠️ Please login first");
+      return;
+    }
+
+    if (!mentor || !date || !time) {
+      alert("⚠️ Please fill all fields");
+      return;
+    }
+
+    try {
+      await bookSession({
+        mentorName: mentor,
+        date,
+        time,
+      });
+
+      alert(`✅ Session booked with ${mentor}`);
+
+      setMentor("");
+      setDate("");
+      setTime("");
+
+    } catch (err) {
+      console.error(err);
+      alert("❌ Booking failed");
+    }
+  };
 
   return (
-    <div style={{ padding: "60px 20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <div className="glass" style={{ padding: "60px", textAlign: "center", position: "relative" }}>
-        <h1 style={{ fontSize: "48px", marginBottom: "20px", lineHeight: 1.05, textShadow: "0 0 24px rgba(79, 70, 229, 0.35)" }}>
-          Discover Your Perfect Career Path
+    <div className="px-10 py-10">
+
+      {/* HERO */}
+      <div className="text-center mt-10">
+        <h1 className="text-5xl font-bold">
+          Discover <span className="gradient-text">Your Career Path</span>
         </h1>
-        <p style={{ opacity: 0.75, fontSize: "1.05rem", maxWidth: "680px", margin: "0 auto 30px" }}>
-          AI-powered guidance for your future 🚀
+
+        <p className="text-gray-400 mt-4">
+          AI-powered career guidance platform 🚀
         </p>
-        <div style={{ marginTop: "20px" }}>
-          <button className="btn-glow" onClick={() => setShowModal(true)}>
-            Start Your Journey →
-          </button>
-        </div>
+
+        {user && (
+          <p className="text-blue-400 mt-4">
+            👋 Welcome, {user.replace("token_", "")}
+          </p>
+        )}
       </div>
 
-      <CareerPaths />
-      <Mentors />
-      <AISuggestion />
-      <Footer />
+      {/* BOOKING */}
+      <div className="mt-20 max-w-xl mx-auto glass p-6 space-y-4">
 
-      {showModal && <LoginModal setUser={setUser} onClose={() => setShowModal(false)} />}
+        <h2 className="text-xl text-center">📅 Book a Session</h2>
+
+        <select
+          value={mentor}
+          onChange={(e) => setMentor(e.target.value)}
+          className="input"
+        >
+          <option value="">Select Mentor</option>
+          {mentors.map((m) => (
+            <option key={m}>{m}</option>
+          ))}
+        </select>
+
+        <input
+          type="date"
+          value={date}
+          min={new Date().toISOString().split("T")[0]}
+          onChange={(e) => setDate(e.target.value)}
+          className="input"
+        />
+
+        <input
+          type="time"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          className="input"
+        />
+
+        <button onClick={handleBooking} className="btn-primary">
+          Book Session
+        </button>
+
+      </div>
+
     </div>
   );
-}
+};
+
+export default Home;

@@ -1,78 +1,44 @@
 import { useState } from "react";
+import { registerUser } from "../services/api";
 
 export default function SignupModal({ onClose }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
-    if (!email || !password) {
-      alert("Enter email & password");
-      return;
-    }
-
-    setLoading(true);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/signup`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("Signup successful ✅");
-        onClose();
-      } else {
-        alert(data.message || "Signup failed ❌");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error ❌");
-    } finally {
-      setLoading(false);
+      await registerUser({ email, password });
+      alert("Signup successful ✅");
+      onClose();
+    } catch {
+      alert("Signup failed ❌");
     }
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="login-modal">
-        <button className="close-btn" onClick={onClose}>
-          ×
-        </button>
+    <div className="fixed inset-0 bg-black/70 flex justify-center items-center">
+      <div className="bg-gray-900 p-6 rounded w-[350px]">
 
-        <h2>Create Account</h2>
-        <p className="subtitle">Join PathWise 🚀</p>
-
-        <div className="badge">🚀 AI-POWERED CAREER PLATFORM</div>
+        <h2 className="text-xl mb-4 text-center">Sign Up</h2>
 
         <input
           type="email"
           placeholder="Email"
-          value={email}
+          className="w-full p-2 mb-3 bg-gray-800 rounded"
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           type="password"
           placeholder="Password"
-          value={password}
+          className="w-full p-2 mb-4 bg-gray-800 rounded"
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="login-btn" onClick={handleSignup} disabled={loading}>
-          {loading ? "Creating Account..." : "Sign Up"}
+        <button onClick={handleSignup} className="w-full bg-blue-500 p-2 rounded">
+          Sign Up
         </button>
 
-        <p className="signup-text">
-          Already have an account? <span>Sign In</span>
-        </p>
       </div>
     </div>
   );

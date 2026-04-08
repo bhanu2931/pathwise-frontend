@@ -1,13 +1,11 @@
-export const isLoggedIn = () => {
-  return !!localStorage.getItem("token");
+export const setUser = (data) => {
+  localStorage.setItem("user", data);
 };
 
 export const getUser = () => {
-  const userStr = localStorage.getItem("user");
-  return userStr ? JSON.parse(userStr) : null;
+  return localStorage.getItem("user");
 };
 
 export const logout = () => {
-  localStorage.clear();
-  window.location.href = "/";
+  localStorage.removeItem("user");
 };

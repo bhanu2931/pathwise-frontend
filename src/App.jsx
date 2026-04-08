@@ -1,29 +1,64 @@
-import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import { Toaster } from "react-hot-toast";
+import { useState } from "react";
+
 import Home from "./pages/Home";
-import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./ProtectedRoute";
+import AI from "./pages/AI";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/Navbar";
+import LoginModal from "./components/LoginModal";
 
 function App() {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")));
+  const [showLogin, setShowLogin] = useState(false);
 
   return (
     <Router>
-      <Navbar user={user} setUser={setUser} />
-      <Routes>
-        <Route path="/" element={<Home setUser={setUser} />} />
-        <Route path="/login" element={<Login setUser={setUser} />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard user={user} />
-            </ProtectedRoute>
-          }
+
+      {/* TOAST */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#020617",
+            color: "#fff",
+          },
+        }}
+      />
+
+      <div className="flex flex-col min-h-screen bg-[#020617] text-white">
+
+        {/* ✅ ONLY ONE NAVBAR */}
+        <Navbar onLoginClick={() => setShowLogin(true)} />
+
+        {/* MAIN */}
+        <div className="flex-1">
+
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/ai" element={<AI />} />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+
+        </div>
+
+        {/* LOGIN MODAL */}
+        <LoginModal
+          isOpen={showLogin}
+          onClose={() => setShowLogin(false)}
         />
-      </Routes>
+
+      </div>
+
     </Router>
   );
 }
