@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://pathwise-backend-q14f.onrender.com",
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 // ✅ Attach token automatically

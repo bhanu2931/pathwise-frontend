@@ -19,8 +19,8 @@ const LoginModal = ({ isOpen, onClose }) => {
       if (isSignup) {
         res = await registerUser({ email, password });
 
-        // 🔥 HANDLE RESPONSE
-        if (res === "User already exists") {
+        // ✅ HANDLE SIGNUP RESPONSE
+        if (res.message === "User already exists") {
           alert("⚠️ User already exists");
           return;
         }
@@ -28,21 +28,18 @@ const LoginModal = ({ isOpen, onClose }) => {
         alert("✅ Signup successful! Please login");
         setIsSignup(false);
         return;
+
       } else {
         res = await loginUser({ email, password });
 
-        // 🔥 HANDLE LOGIN ERRORS
-        if (
-          res === "User not found" ||
-          res === "Invalid password" ||
-          res === "Missing credentials"
-        ) {
-          alert("❌ " + res);
+        // ✅ HANDLE LOGIN ERRORS
+        if (res.message) {
+          alert("❌ " + res.message);
           return;
         }
 
         // ✅ SUCCESS LOGIN
-        setUser(res);
+        setUser(res); // stores token
         alert("✅ Login successful");
         navigate("/dashboard");
         onClose();
@@ -56,7 +53,6 @@ const LoginModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex justify-center items-center z-50">
-
       <div className="relative w-[420px] p-8 rounded-2xl bg-[#020617] border border-white/10 shadow-2xl">
 
         {/* CLOSE */}
